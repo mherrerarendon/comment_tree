@@ -1,7 +1,14 @@
-from flask import Blueprint, send_from_directory, current_app
+from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
 
-bp = Blueprint('thread', __name__, url_prefix='/thread')
+from ct.models.thread import Thread
+from ct import db
 
-@bp.route('/', methods=('GET', 'POST'))
+bp = Blueprint('threads', __name__, url_prefix='/threads')
+
+@bp.route('/thread', methods=('GET', 'POST'))
 def create_thread():
-    pass
+    if request.method == 'POST':
+        thread = Thread()
+        db.session.add(thread)
+        db.session.commit()
+        return jsonify({'thread_id': thread.id}), 201
