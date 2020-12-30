@@ -1,6 +1,7 @@
 from ct.core.app import create_app 
 
 app = create_app()
+app.run(debug=True)
 # from flask import Flask
 # from flask_sqlalchemy import SQLAlchemy
 
