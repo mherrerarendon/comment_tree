@@ -2,13 +2,11 @@ from flask import Flask
 
 from ct import db
 
-def create_app(app=None):
-    # if not app:
-    # app = Flask('ct')
+def create_app():
     app = Flask(__name__)
     config_app(app)
     setup_db(app)
-    # _register_blueprints(app)
+    register_blueprints(app)
     return app
 
 def setup_db(app):
@@ -22,3 +20,7 @@ def setup_db(app):
 
 def config_app(app):
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+
+def register_blueprints(app):
+    from ct.blueprints import threads
+    app.register_blueprint(threads.bp)
