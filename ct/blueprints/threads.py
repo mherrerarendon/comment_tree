@@ -1,6 +1,5 @@
 from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
 
-# from ct.models.thread import Thread
 from ct.models.comment import Comment
 from ct import db
 
@@ -12,12 +11,9 @@ def create_thread():
     comment = Comment(username=req_payload['username'], content=req_payload['content'])
     db.session.add(comment)
     db.session.commit()
-    # old
-    # thread = Thread(id=1)
-    # db.session.add(thread)
-    # db.session.commit()
     return jsonify({'thread_id': comment.id}), 201
 
+# TODO: print the complete tree.
 @bp.route('/thread/<thread_id>', methods=('GET',))
 def get_thread(thread_id):
     payload = {}
@@ -44,7 +40,3 @@ def append_comment_to_thread(thread_id):
         return jsonify({'comment_id': comment.id}), 201 
     else:
         return 'not found', 404
-
-@bp.route('/thread/<thread_id>/comment/<comment_id>', methods=('POST',))
-def branch_comment(thread_id, comment_id):
-    pass
