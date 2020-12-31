@@ -1,6 +1,6 @@
 from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
 
-from ct.models.thread import Thread
+# from ct.models.thread import Thread
 from ct.models.comment import Comment
 from ct import db
 
@@ -8,7 +8,7 @@ bp = Blueprint('threads', __name__, url_prefix='/threads')
 
 @bp.route('/thread', methods=('POST',))
 def create_thread():
-    thread = Thread()
+    thread = Thread(id=1)
     db.session.add(thread)
     db.session.commit()
     return jsonify({'thread_id': thread.id}), 201
@@ -38,3 +38,7 @@ def add_comment_to_thread(thread_id):
         return jsonify({'comment_id': comment.id}), 201 
     else:
         return 'not found', 404
+
+@bp.route('/thread/<thread_id>/comment/<comment_id>', methods=('POST',))
+def branch_comment(thread_id, comment_id):
+    pass
