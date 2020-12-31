@@ -8,32 +8,38 @@ bp = Blueprint('threads', __name__, url_prefix='/threads')
 
 @bp.route('/thread', methods=('POST',))
 def create_thread():
-    thread = Thread(id=1)
-    db.session.add(thread)
+    req_payload = request.get_json()
+    comment = Comment(username=req_payload['username'], content=req_payload['content'])
+    db.session.add(comment)
     db.session.commit()
-    return jsonify({'thread_id': thread.id}), 201
+    # old
+    # thread = Thread(id=1)
+    # db.session.add(thread)
+    # db.session.commit()
+    return jsonify({'thread_id': comment.id}), 201
 
 @bp.route('/thread/<thread_id>', methods=('GET',))
 def get_thread(thread_id):
     payload = {}
-    thread = Thread.query.filter_by(id=thread_id).first()
-    if thread:
+    parent_comment = Comment.query.filter_by(id=thread_id).first()
+    if parent_comment:
         payload['thread_id'] = thread_id
+        payload['comments'] = [{'username': parent_comment.username, 'content': parent_comment.content}]
         
         # TODO: order by date
-        comments = Comment.query.filter_by(thread_id=thread_id)
-        payload['comments'] = [{'username': comment.username, 'content': comment.content} for comment in comments]
+        comments = Comment.query.filter_by(parent_id=thread_id)
+        payload['comments'].extend([{'username': comment.username, 'content': comment.content} for comment in comments])
         return jsonify(payload), 200
     else:
         return 'not found', 404
 
 @bp.route('/thread/<thread_id>/comment', methods=('POST',))
-def add_comment_to_thread(thread_id):
+def append_comment_to_thread(thread_id):
     req_payload = request.get_json()
-    thread = Thread.query.filter_by(id=thread_id).first()
-    if thread:
+    parent_comment = Comment.query.filter_by(id=thread_id).first()
+    if parent_comment:
         comment = Comment(username=req_payload['username'], content=req_payload['content'])
-        thread.comments.append(comment)
+        parent_comment.thread.append(comment)
         db.session.commit()
         return jsonify({'comment_id': comment.id}), 201 
     else:
