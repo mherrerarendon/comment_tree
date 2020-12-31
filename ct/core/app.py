@@ -19,7 +19,8 @@ def setup_db(app):
     db.init_app(app)
 
 def config_app(app):
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
 
 def register_blueprints(app):
     from ct.blueprints import threads
