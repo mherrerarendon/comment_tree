@@ -15,6 +15,8 @@ class Comment(db.Model):
 
     def to_dict(self, recursive=False):
         d = {
+            'id': self.id,
+            'parent_id': self.parent_id,
             'username': self.username, 
             'content': self.content,
             'time_stamp': self.time_stamp

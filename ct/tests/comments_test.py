@@ -35,4 +35,28 @@ def test_threadsAreReturnedInOrder(test_db):
     assert len(thread) == 2
     assert thread[0]['content'] == 'second in thread'
     assert thread[1]['content'] == 'third in thread'
+
+def test_subthreadsWork(test_db):
+    parent_comment = Comment(username='marco', content='parent comment')
+    test_db.session.add(parent_comment)
+    child_comment = Comment(username='marco', content='child comment')
+    parent_comment.thread.append(child_comment)
+    grandchild_comment = Comment(username='marco', content='grand child comment')
+    child_comment.thread.append(grandchild_comment)
+    test_db.session.commit()
+    thread = child_comment.get_thread()
+    assert len(thread) == 1
+    assert thread[0]['content'] == 'grand child comment'
+
+def test_recursiveSubthreadsWork(test_db):
+    parent_comment = Comment(username='marco', content='parent comment')
+    test_db.session.add(parent_comment)
+    child_comment = Comment(username='marco', content='child comment')
+    parent_comment.thread.append(child_comment)
+    grandchild_comment = Comment(username='marco', content='grand child comment')
+    child_comment.thread.append(grandchild_comment)
+    test_db.session.commit()
+    thread = parent_comment.get_thread(recursive=True)
+    assert thread[0]['content'] == 'child comment'
+    assert thread[0]['thread'][0]['content'] == 'grand child comment'
     

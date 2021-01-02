@@ -10,16 +10,15 @@ def create_thread():
     comment = Comment(username=req_payload['username'], content=req_payload['content'])
     db.session.add(comment)
     db.session.commit()
-    return jsonify({'thread_id': comment.id}), 201
+    return jsonify(comment.to_dict()), 201
 
 @bp.route('/thread/<thread_id>', methods=('GET',))
 def get_thread(thread_id):
     payload = {}
     parent_comment = Comment.query.filter_by(id=thread_id).first()
     if parent_comment:
-        payload['thread_id'] = thread_id
         payload['comment'] = parent_comment.to_dict()
-        recurse_threads = False if 'recursive' not in request.args else request.args['recursive']
+        recurse_threads = False if 'recursive' not in request.args else (request.args['recursive'].lower() == 'true')
         payload['thread'] = parent_comment.get_thread(recurse_threads)
         return jsonify(payload), 200
     else:
@@ -33,7 +32,7 @@ def append_comment_to_thread(thread_id):
         comment = Comment(username=req_payload['username'], content=req_payload['content'])
         parent_comment.thread.append(comment)
         db.session.commit()
-        return jsonify({'comment_id': comment.id}), 201 
+        return jsonify(comment.to_dict()), 201 
     else:
         return 'not found', 404
 
