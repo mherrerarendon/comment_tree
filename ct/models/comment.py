@@ -1,14 +1,15 @@
 from ct import db
+from ct.models.user import User
 import datetime
 
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer, db.ForeignKey('comment.id'), nullable=True)
-    username = db.Column(db.String(80), unique=False, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=False, nullable=False)
     content = db.Column(db.String(120), unique=False, nullable=False)
     time_stamp = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.datetime.utcnow)
     thread = db.relationship('Comment', lazy=True)
-    
+    user = db.relationship('User')    
 
     def __repr__(self):
         return f'<user: {self.username} content: {self.content}>'
@@ -17,7 +18,7 @@ class Comment(db.Model):
         d = {
             'id': self.id,
             'parent_id': self.parent_id,
-            'username': self.username, 
+            'username': self.user.username, 
             'content': self.content,
             'time_stamp': self.time_stamp
         }

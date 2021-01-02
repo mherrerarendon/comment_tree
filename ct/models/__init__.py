@@ -1,3 +1,3 @@
 from .comment import Comment
 
-__all__ = ('Comment',)
+__all__ = ('Comment', 'User',)
