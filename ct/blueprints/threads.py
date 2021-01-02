@@ -1,7 +1,6 @@
-from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
-
 from ct.models.comment import Comment
 from ct import db
+from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
 
 bp = Blueprint('threads', __name__, url_prefix='/threads')
 
@@ -13,18 +12,15 @@ def create_thread():
     db.session.commit()
     return jsonify({'thread_id': comment.id}), 201
 
-# TODO: print the complete tree.
 @bp.route('/thread/<thread_id>', methods=('GET',))
 def get_thread(thread_id):
     payload = {}
     parent_comment = Comment.query.filter_by(id=thread_id).first()
     if parent_comment:
         payload['thread_id'] = thread_id
-        payload['comments'] = [{'username': parent_comment.username, 'content': parent_comment.content}]
-        
-        # TODO: order by date
-        comments = Comment.query.filter_by(parent_id=thread_id)
-        payload['comments'].extend([{'username': comment.username, 'content': comment.content} for comment in comments])
+        payload['comment'] = parent_comment.to_dict()
+        recurse_threads = False if 'recursive' not in request.args else request.args['recursive']
+        payload['thread'] = parent_comment.get_thread(recurse_threads)
         return jsonify(payload), 200
     else:
         return 'not found', 404
@@ -40,3 +36,5 @@ def append_comment_to_thread(thread_id):
         return jsonify({'comment_id': comment.id}), 201 
     else:
         return 'not found', 404
+
+# TODO: editable db path in configuration (memory for tests and filesystem for server)

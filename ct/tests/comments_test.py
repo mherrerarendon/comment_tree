@@ -23,11 +23,16 @@ def test_GetAllWorks2(test_db):
     test_db.session.commit()
     assert len(Comment.query.all()) == 2
 
-def test_threadsWork(test_db):
+def test_threadsAreReturnedInOrder(test_db):
     parentComment = Comment(username='marco', content='first in thread')
+    test_db.session.add(parentComment)
     secondComment = Comment(username='marco', content='second in thread')
     thirdComment = Comment(username='marco', content='third in thread')
     parentComment.thread.append(secondComment)
     parentComment.thread.append(thirdComment)
-    assert len(parentComment.thread) == 2
+    test_db.session.commit()
+    thread = parentComment.get_thread()
+    assert len(thread) == 2
+    assert thread[0]['content'] == 'second in thread'
+    assert thread[1]['content'] == 'third in thread'
     
