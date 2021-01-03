@@ -1,5 +1,6 @@
-from ct.models.comment import Comment
 from ct import db
+from ct.models.comment import Comment
+from ct.models.notification import Notification
 from ct.blueprints.utils import get_query_arg
 from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
 
@@ -30,27 +31,17 @@ def append_comment_to_thread(thread_id):
     arg_defaults = {'notify': False}
     parent_comment = Comment.query.filter_by(id=thread_id).first()
     if parent_comment:
+        with_notification = get_query_arg(request.args, 'notify', arg_defaults)
         comment = do_add_comment_to_thread(parent_comment, request.get_json())
-        if get_query_arg(request.args, 'notify', arg_defaults):
-            add_notification_for_relevant_users(parent_comment)
+        if with_notification:
+            Notification.create_comment_notifications(comment)
         return jsonify(comment.to_dict()), 201 
     else:
         return 'not found', 404
 
 def do_add_comment_to_thread(parent_comment, req_payload):
     comment = Comment(username=req_payload['username'], content=req_payload['content'])
-    parent_comment.thread.append(comment)
-    db.session.commit()
+    parent_comment.add_comment_to_thread(comment)
     return comment
-
-def add_notification_for_relevant_users(parent_comment, comment):
-    relevant_users = [parent_comment.username].extend([c.username for c in parent_comment.thread])
-    relevant_users = set(relevant_users)
-    for user in relevant_users:
-        add_notification(user, comment)
-    return relevant_users
-
-def add_notification(user, comment):
-    print(f'Notifying {user} about new comment')
 
 # TODO: editable db path in configuration (memory for tests and filesystem for server)

@@ -7,7 +7,6 @@ import pytest
 
 class TestComments:
     def setup_class(self):
-        print("setup_class called once for the class")
         app = create_app()
         app.app_context().push()
         db.create_all()
@@ -16,7 +15,7 @@ class TestComments:
         db.session.commit()
 
     def teardown_class(self):
-        print("teardown_class called once for the class")
+        db.drop_all()
 
     def test_GetAllWorks(self):
         c1 = Comment(content='testscontent', user=self.user)

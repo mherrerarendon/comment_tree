@@ -1,5 +1,6 @@
 from ct import db
 from ct.models.user import User
+# from ct.models.notification import Notification
 import datetime
 
 class Comment(db.Model):
@@ -9,10 +10,10 @@ class Comment(db.Model):
     content = db.Column(db.String(120), unique=False, nullable=False)
     time_stamp = db.Column(db.DateTime, unique=False, nullable=False, default=datetime.datetime.utcnow)
     thread = db.relationship('Comment', lazy=True)
-    user = db.relationship('User')    
+    user = db.relationship('User')
 
     def __repr__(self):
-        return f'<user: {self.username} content: {self.content}>'
+        return f'<user: {self.user.username} content: {self.content}>'
 
     def to_dict(self, recursive=False):
         d = {
@@ -33,3 +34,13 @@ class Comment(db.Model):
             return [comment.to_dict(recursive) for comment in comments]
         else:
             return []
+
+    # TODO: test
+    def get_user_ids_in_thread(self):
+        user_ids = [self.user_id]
+        user_ids.extend([c.user_id for c in self.thread])
+        return set(user_ids)
+
+    def add_comment_to_thread(self, comment):
+        self.thread.append(comment)
+        db.session.commit()  
