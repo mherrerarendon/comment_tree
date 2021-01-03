@@ -7,17 +7,15 @@ import pytest
 
 @pytest.fixture()
 def user1(request):
-    print("setup")
     db.create_all()
     user1 = User(username='user1')
     db.session.add(user1)
     db.session.commit()
 
     def teardown():
-        print("teardown")
         db.drop_all()
     request.addfinalizer(teardown)
-    
+
     return user1
 
 class TestIntegration:
@@ -31,25 +29,54 @@ class TestIntegration:
     def teardown_class(self):
         pass
 
-    def create_thread(self, client, user1, content):
+    def create_thread(self, user1, content):
         payload = {
             "username": user1.username,
             "content": content
         }
-        response = client.post(
-                '/threads/thread',
-                data=json.dumps(payload),
-                content_type='application/json',
-        )
+        with self.app.test_client() as client:
+            response = client.post(
+                    '/threads/thread',
+                    data=json.dumps(payload),
+                    content_type='application/json',
+            )
         return response
 
-    # def add_comment_to_thread(self, client, user1, )
-
-    def test_simple_add_comment_works(self, user1):
+    def add_comment_to_thread(self, user1, thread_id, content):
+        payload = {
+            "username": user1.username,
+            "content": content
+        }
         with self.app.test_client() as client:
-            test_content = 'my new comment'
-            response = self.create_thread(client, user1, 'my new comment')
-            data = json.loads(response.data.decode())
-            assert response.status_code == 201
-            assert data['content'] == test_content
+            response = client.post(
+                    f'/threads/thread/{thread_id}/comment',
+                    data=json.dumps(payload),
+                    content_type='application/json',
+            )
+        return response
 
+    def test_create_thread(self, user1):
+        test_content = 'my new comment'
+        response = self.create_thread(user1, test_content)
+        data = json.loads(response.data.decode())
+        assert response.status_code == 201
+        assert data['content'] == test_content
+
+    def test_get_thread(self, user1):
+        test_content = 'thread comment'
+        data = json.loads(self.create_thread(user1, test_content).data.decode())
+        thread_id = data['id']
+        with self.app.test_client() as client:
+            response = client.get(
+                    f'/threads/thread/{thread_id}'
+            )
+        data = json.loads(response.data.decode())
+        assert response.status_code == 200
+        assert data['comment']['content'] == test_content
+
+    def test_append_comment_to_thread(self, user1):
+        data = json.loads(self.create_thread(user1, 'thread comment').data.decode())
+        test_content = 'comment in thread'
+        thread_id = data['id']
+        response = self.add_comment_to_thread(user1, thread_id, test_content)
+        assert response.status_code == 201

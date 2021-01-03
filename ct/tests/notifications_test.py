@@ -8,7 +8,6 @@ import pytest
 
 @pytest.fixture()
 def users(request):
-    print("setup")
     db.create_all()
     users = []
     users.append(User(username='user1'))
@@ -16,7 +15,6 @@ def users(request):
     users.append(User(username='user3'))
 
     def teardown():
-        print("teardown")
         db.drop_all()
     request.addfinalizer(teardown)
     

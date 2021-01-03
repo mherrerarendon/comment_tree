@@ -31,18 +31,20 @@ def get_thread(thread_id):
 @bp.route('/thread/<thread_id>/comment', methods=('POST',))
 def append_comment_to_thread(thread_id):
     arg_defaults = {'notify': False}
+    req_payload = request.get_json()
     parent_comment = Comment.query.filter_by(id=thread_id).first()
-    if parent_comment:
+    user = User.query.filter_by(username=req_payload['username']).first()
+    if parent_comment and user:
         with_notification = get_query_arg(request.args, 'notify', arg_defaults)
-        comment = do_add_comment_to_thread(parent_comment, request.get_json())
+        comment = do_add_comment_to_thread(parent_comment, user, req_payload)
         if with_notification:
             Notification.create_comment_notifications(comment)
         return jsonify(comment.to_dict()), 201 
     else:
         return 'not found', 404
 
-def do_add_comment_to_thread(parent_comment, req_payload):
-    comment = Comment(username=req_payload['username'], content=req_payload['content'])
+def do_add_comment_to_thread(parent_comment, user, req_payload):
+    comment = Comment(user=user, content=req_payload['content'])
     parent_comment.add_comment_to_thread(comment)
     return comment
 

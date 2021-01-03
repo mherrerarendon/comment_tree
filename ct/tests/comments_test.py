@@ -7,11 +7,9 @@ import pytest
 
 @pytest.fixture()
 def user1(request):
-    print("setup")
     db.create_all()
 
     def teardown():
-        print("teardown")
         db.drop_all()
     request.addfinalizer(teardown)
     
