@@ -47,5 +47,3 @@ def do_add_comment_to_thread(parent_comment, user, req_payload):
     comment = Comment(user=user, content=req_payload['content'])
     parent_comment.add_comment_to_thread(comment)
     return comment
-
-# TODO: editable db path in configuration (memory for tests and filesystem for server)

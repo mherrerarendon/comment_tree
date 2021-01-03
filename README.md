@@ -24,4 +24,5 @@ In a terminal with the virtual environment activated, cd to root directory of th
 In a terminal with the virtual environment activated, cd to "ct" dir, and enter `pytest`
 ## TODO
 - Editable app configurations (test vs prod environment)
-- Add GitHub actions to test on merge
+## References
+The project https://github.com/GameSurge/web/tree/master/gsweb was extremely helpful
