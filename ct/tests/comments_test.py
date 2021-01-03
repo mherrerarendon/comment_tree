@@ -2,7 +2,7 @@ from ct.models.comment import Comment
 from ct.models.user import User
 from ct import db
 from ct.core.app import create_app 
-
+from flask import current_app
 import pytest
 
 @pytest.fixture()
@@ -19,13 +19,14 @@ def user1(request):
 
 class TestComments:
     def setup_class(self):
-        app = create_app()
-        app.app_context().push()
+        if not current_app:
+            app = create_app()
+            app.app_context().push()
+        else:
+            app = current_app
 
     def teardown_class(self):
         pass
-        # app.app_context().pop()
-        # db.drop_all()
 
     def test_GetAllWorks(self, user1):
         c1 = Comment(content='testscontent', user=user1)

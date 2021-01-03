@@ -24,7 +24,6 @@ def users(request):
 
 class TestNotifications:
     def setup_class(self):
-        # pass
         if not current_app:
             app = create_app()
             app.app_context().push()
@@ -32,8 +31,6 @@ class TestNotifications:
             app = current_app
         
     def teardown_class(self):
-        # app.app_context().pop()
-        # Do I need to tear down app here?
         pass
 
     def test_simple_notification_works(self, users):
