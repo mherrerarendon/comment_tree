@@ -1,6 +1,7 @@
 from ct import db
 from ct.models.comment import Comment
 from ct.models.notification import Notification
+from ct.models.user import User
 from ct.blueprints.utils import get_query_arg
 from flask import Blueprint, request, jsonify, Response
 
@@ -9,7 +10,8 @@ bp = Blueprint('threads', __name__, url_prefix='/threads')
 @bp.route('/thread', methods=('POST',))
 def create_thread():
     req_payload = request.get_json()
-    comment = Comment(username=req_payload['username'], content=req_payload['content'])
+    user = User.query.filter_by(username=req_payload['username']).first()
+    comment = Comment(user=user, content=req_payload['content'])
     db.session.add(comment)
     db.session.commit()
     return jsonify(comment.to_dict()), 201
