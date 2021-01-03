@@ -1,6 +1,5 @@
 from ct import db
 from ct.models.user import User
-# from ct.models.notification import Notification
 import datetime
 
 class Comment(db.Model):
@@ -35,7 +34,6 @@ class Comment(db.Model):
         else:
             return []
 
-    # TODO: test
     def get_user_ids_in_thread(self):
         user_ids = [self.user_id]
         user_ids.extend([c.user_id for c in self.thread])

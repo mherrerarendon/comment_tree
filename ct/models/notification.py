@@ -32,6 +32,7 @@ class Notification(db.Model):
     def create_comment_notifications(comment):
         parent_comment = Comment.query.filter_by(id=comment.parent_id).first()
         user_id_list = parent_comment.get_user_ids_in_thread()
+        user_id_list.remove(comment.user_id) # We don't want to add a notification for the user that made the comment.
         for user_id in user_id_list:
             n = Notification(user_id=user_id, comment_id=comment.id)
             db.session.add(n)

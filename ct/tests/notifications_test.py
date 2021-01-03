@@ -35,5 +35,21 @@ class TestNotifications:
         assert user1Notifications[c1.id][0].id == c2.id
 
         # Make sure user 2 doesn't get notification of his own comment
-        # assert len(user2Notifications) == 0
+        assert len(user2Notifications) == 0
+
+    def test_subthread_comment_should_not_notify_parent_thread(self):
+        c1 = Comment(content='first', user=self.user1)
+        db.session.add(c1)
+        c2 = Comment(content='second', user=self.user2)
+        c1.add_comment_to_thread(c2)
+        c3 = Comment(content='third', user=self.user3)
+        c2.add_comment_to_thread(c3)
+        Notification.create_comment_notifications(c3)
+        user1Notifications = Notification.get_notifications_by_thread_for_user(self.user1.id)
+        user2Notifications = Notification.get_notifications_by_thread_for_user(self.user2.id)
+        user3Notifications = Notification.get_notifications_by_thread_for_user(self.user3.id)
+
+        assert len(user1Notifications) == 0
+        assert len(user2Notifications) == 1
+        assert len(user3Notifications) == 0
 
