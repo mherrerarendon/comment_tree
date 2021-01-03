@@ -24,4 +24,6 @@ def config_app(app):
 
 def register_blueprints(app):
     from ct.blueprints import threads
+    from ct.blueprints import notifications
     app.register_blueprint(threads.bp)
+    app.register_blueprint(notifications.bp)

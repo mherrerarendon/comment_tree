@@ -18,7 +18,7 @@ def user1(request):
 
     return user1
 
-class TestIntegration:
+class TestThreadBlueprints:
     def setup_class(self):
         if not current_app:
             self.app = create_app()
@@ -66,13 +66,18 @@ class TestIntegration:
         test_content = 'thread comment'
         data = json.loads(self.create_thread(user1, test_content).data.decode())
         thread_id = data['id']
+        data = json.loads(self.add_comment_to_thread(user1, thread_id, test_content).data.decode())
+        sub_thread_id = data['id']
+        data = json.loads(self.add_comment_to_thread(user1, sub_thread_id, test_content).data.decode())
         with self.app.test_client() as client:
             response = client.get(
-                    f'/threads/thread/{thread_id}'
+                    f'/threads/thread/{thread_id}?recursive=True'
             )
         data = json.loads(response.data.decode())
         assert response.status_code == 200
         assert data['comment']['content'] == test_content
+        assert len(data['thread']) == 1
+        assert len(data['thread'][0]['thread']) == 1
 
     def test_append_comment_to_thread(self, user1):
         data = json.loads(self.create_thread(user1, 'thread comment').data.decode())

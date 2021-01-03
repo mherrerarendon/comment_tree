@@ -18,13 +18,13 @@ class Notification(db.Model):
         pass
 
     @staticmethod
-    def get_notifications_by_thread_for_user(user_id):
+    def get_comment_notifications(user_id):
         notifications = Notification.query.filter_by(user_id=user_id)
         comments = [n.comment for n in notifications]
         unique_threads = set([c.parent_id for c in comments])
         notifications_by_thread = {}
         for unique_thread in unique_threads:
-            thread_comments = [c for c in comments if c.parent_id == unique_thread]
+            thread_comments = [c.to_dict() for c in comments if c.parent_id == unique_thread]
             notifications_by_thread[unique_thread] = thread_comments
         return notifications_by_thread
 
