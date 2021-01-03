@@ -2,7 +2,7 @@ from ct import db
 from ct.models.comment import Comment
 from ct.models.notification import Notification
 from ct.blueprints.utils import get_query_arg
-from flask import Blueprint, send_from_directory, current_app, request, jsonify, Response
+from flask import Blueprint, request, jsonify, Response
 
 bp = Blueprint('threads', __name__, url_prefix='/threads')
 
