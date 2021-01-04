@@ -26,7 +26,3 @@ In a terminal with the virtual environment activated, cd to root directory of th
 In a terminal with the virtual environment activated, cd to "ct" dir, and enter `pytest`
 ## Documentation
 [REST API Reference](https://github.com/mherrerarendon/comment_tree/wiki/Rest-API-Reference)
-## TODO
-- Editable app configurations (test vs prod environment)
-## References
-The project https://github.com/GameSurge/web/tree/master/gsweb was extremely helpful
