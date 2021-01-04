@@ -24,6 +24,8 @@ pip install -r requirements.txt
 In a terminal with the virtual environment activated, cd to root directory of this repository and enter `python serve.py` 
 ## Run project unit and integration tests
 In a terminal with the virtual environment activated, cd to "ct" dir, and enter `pytest`
+## Documentation
+[REST API Reference](https://github.com/mherrerarendon/comment_tree/wiki/Rest-API-Reference)
 ## TODO
 - Editable app configurations (test vs prod environment)
 ## References
