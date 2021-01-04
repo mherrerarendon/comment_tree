@@ -1,3 +1,4 @@
+pytest-cov
 flask
 flask_sqlalchemy
 pytest
